@@ -1,0 +1,85 @@
+
+ 
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <a href="addnew/" class="btn btn-primary">Add New</a>
+        <br><br>
+        <body>
+            <div class="container mt-5">
+                <h1>Employees</h1>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Office</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        {% for row in data %}
+                        <tr>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <h2>Add New Employee</h2>
+                <form id="addForm"> 
+                    
+                    <div class="mb-3">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Name" class="form-control" />
+                    </div> 
+                    <div class="mb-3">
+                        <label for="position">Position</label>
+                        <input type="text" id="position" name="position" placeholder="Position" class="form-control" />
+                    </div> 
+                    <div class="mb-3">
+                        <label for="office">Office</label>
+                        <input type="text" id="office" name="office" placeholder="Office" class="form-control" />
+                    </div> 
+                    <button type="button" onclick="submitForm()" class="btn btn-primary mb-3">Submit</button>  
+                </form> 
+            </div>
+        
+         
+        
+            <script src="{{ url_for('static', path='/js/bootstrap.bundle.min.js') }}"></script>
+        </body>
+    </div>
+</div>
+<script>
+    function submitForm() {
+        var formData = new FormData(document.getElementById("addForm"));
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/add", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if ("data" in response) {
+                    updateTable(response.data);
+                } else if ("error" in response) {
+                    alert(response.error);
+                }
+            }
+        };
+        xhr.send(new URLSearchParams(formData).toString());
+    }
+
+    function updateTable(data) {
+        var tableBody = document.getElementById("dataTableBody");
+        tableBody.innerHTML = ""; // Xóa dữ liệu cũ
+        data.forEach(function(row) {
+            var newRow = document.createElement("tr");
+            newRow.innerHTML = "<td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td>";
+            tableBody.appendChild(newRow);
+        });
+    }
+</script>
+{% endblock content %}
